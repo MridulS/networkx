@@ -10,6 +10,7 @@ from .eigenvector import *
 from .group import *
 from .harmonic import *
 from .katz import *
+from .knotty import *
 from .load import *
 from .percolation import *
 from .reaching import *
