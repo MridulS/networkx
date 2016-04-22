@@ -1,32 +1,32 @@
-"""Sparse6
-
-Read and write graphs in sparse6 format.
-
-Format
-------
-
-"graph6 and sparse6 are formats for storing undirected graphs in a
-compact manner, using only printable ASCII characters. Files in these
-formats have text type and contain one line per graph."
-
-See http://cs.anu.edu.au/~bdm/data/formats.txt for details.
-"""
 # Original author: D. Eppstein, UC Irvine, August 12, 2003.
 # The original code at http://www.ics.uci.edu/~eppstein/PADS/ is public domain.
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
 #    Tomas Gavenciak <gavento@ucw.cz>
 #    All rights reserved.
 #    BSD license.
+#
+# Authors: Tomas Gavenciak <gavento@ucw.cz>
+#          Aric Hagberg <aric.hagberg@lanl.gov>
+"""Functions for reading and writing graphs in the *sparse6* format.
+
+The *sparse6* file format is a space-efficient format for large sparse
+graphs. For small graphs or large dense graphs, use the *graph6* file
+format.
+
+For more information, see the `sparse6`_ homepage.
+
+.. _sparse6: http://users.cecs.anu.edu.au/~bdm/data/formats.html
+
+"""
 import networkx as nx
 from networkx.exception import NetworkXError
 from networkx.utils import open_file, not_implemented_for
 from networkx.readwrite.graph6 import data_to_graph6, graph6_to_data,\
     data_to_n, n_to_data
-__author__ = """\n""".join(['Tomas Gavenciak <gavento@ucw.cz>',
-                            'Aric Hagberg <aric.hagberg@lanl.gov'])
+
 __all__ = ['read_sparse6', 'parse_sparse6',
            'generate_sparse6', 'write_sparse6']
 
@@ -59,7 +59,9 @@ def parse_sparse6(string):
 
     References
     ----------
-    Sparse6 specification: http://cs.anu.edu.au/~bdm/data/formats.txt
+    .. [1] Sparse6 specification
+           <http://users.cecs.anu.edu.au/~bdm/data/formats.html>
+
     """
     if string.startswith('>>sparse6<<'):
         string = string[11:]
@@ -148,7 +150,9 @@ def read_sparse6(path):
 
     References
     ----------
-    Sparse6 specification: http://cs.anu.edu.au/~bdm/data/formats.txt
+    .. [1] Sparse6 specification
+           <http://users.cecs.anu.edu.au/~bdm/data/formats.html>
+
     """
     glist = []
     for line in path:
@@ -199,10 +203,12 @@ def generate_sparse6(G, nodes=None, header=True):
     Notes
     -----
     The format does not support edge or node labels.
+
     References
     ----------
-    Sparse6 specification:
-    http://cs.anu.edu.au/~bdm/data/formats.txt for details.
+    .. [1] Sparse6 specification
+           <http://users.cecs.anu.edu.au/~bdm/data/formats.html>
+
     """
     n = G.order()
     k = 1
@@ -261,6 +267,7 @@ def generate_sparse6(G, nodes=None, header=True):
 @open_file(1, mode='wt')
 def write_sparse6(G, path, nodes=None, header=True):
     """Write graph G to given path in sparse6 format.
+
     Parameters
     ----------
     G : Graph (undirected)
@@ -295,8 +302,9 @@ def write_sparse6(G, path, nodes=None, header=True):
 
     References
     ----------
-    Sparse6 specification:
-    http://cs.anu.edu.au/~bdm/data/formats.txt for details.
+    .. [1] Sparse6 specification
+           <http://users.cecs.anu.edu.au/~bdm/data/formats.html>
+
     """
     path.write(generate_sparse6(G, nodes=nodes, header=header))
     path.write('\n')

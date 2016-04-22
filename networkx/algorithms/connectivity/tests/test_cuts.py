@@ -209,8 +209,8 @@ def test_missing_target():
 
 def test_not_weakly_connected():
     G = nx.DiGraph()
-    G.add_path([1, 2, 3])
-    G.add_path([4, 5])
+    nx.add_path(G, [1, 2, 3])
+    nx.add_path(G, [4, 5])
     for interface_func in [nx.minimum_edge_cut, nx.minimum_node_cut]:
         for flow_func in flow_funcs:
             assert_raises(nx.NetworkXError, interface_func, G,
@@ -218,8 +218,8 @@ def test_not_weakly_connected():
 
 def test_not_connected():
     G = nx.Graph()
-    G.add_path([1, 2, 3])
-    G.add_path([4, 5])
+    nx.add_path(G, [1, 2, 3])
+    nx.add_path(G, [4, 5])
     for interface_func in [nx.minimum_edge_cut, nx.minimum_node_cut]:
         for flow_func in flow_funcs:
             assert_raises(nx.NetworkXError, interface_func, G,
@@ -237,6 +237,13 @@ def tests_min_cut_complete_directed():
     for interface_func in [nx.minimum_edge_cut, nx.minimum_node_cut]:
         for flow_func in flow_funcs:
             assert_equal(4, len(interface_func(G, flow_func=flow_func)))
+
+def tests_minimum_st_node_cut():
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 7, 8, 11, 12])
+    G.add_edges_from([(7, 11), (1, 11), (1, 12), (12, 8), (0, 1)])
+    nodelist = minimum_st_node_cut(G, 7, 11)
+    assert(nodelist == [])
 
 def test_invalid_auxiliary():
     G = nx.complete_graph(5)

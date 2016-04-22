@@ -1,5 +1,5 @@
 """PageRank analysis of graph structure. """
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -334,9 +334,9 @@ def pagerank_numpy(G, alpha=0.85, personalization=None, weight='weight',
                       weight=weight, dangling=dangling)
     # use numpy LAPACK solver
     eigenvalues, eigenvectors = np.linalg.eig(M.T)
-    ind = eigenvalues.argsort()
-    # eigenvector of largest eigenvalue at ind[-1], normalized
-    largest = np.array(eigenvectors[:, ind[-1]]).flatten().real
+    ind = np.argmax(eigenvalues)
+    # eigenvector of largest eigenvalue is at ind, normalized
+    largest = np.array(eigenvectors[:, ind]).flatten().real
     norm = float(largest.sum())
     return dict(zip(G, map(float, largest / norm)))
 

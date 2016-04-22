@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Generate graphs with a given degree sequence or expected degree sequence.
 """
-#    Copyright (C) 2004-2015 by 
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -752,7 +752,7 @@ class DegreeSequenceRandomGraph(object):
         return self.remaining_degree[u]*self.remaining_degree[v]/norm
 
     def suitable_edge(self):
-        """Returns ``True`` if and only if an arbitrary remaining node can
+        """Returns True if and only if an arbitrary remaining node can
         potentially be joined with some other remaining node.
 
         """

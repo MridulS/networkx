@@ -6,7 +6,7 @@ current classes to see if adding features has slowed any methods.
 The classes are named TimingGraph, TimingDiGraph, 
 TimingMultiGraph and TimingMultiDiGraph
 """
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -3386,7 +3386,7 @@ class TimingMultiGraph(TimingGraph):
             Remove an edge between nodes u and v.
         key : hashable identifier, optional (default=None)
             Used to distinguish multiple edges between a pair of nodes.
-            If None remove a single (abritrary) edge between u and v.
+            If None remove a single (arbitrary) edge between u and v.
 
         Raises
         ------
@@ -4255,7 +4255,7 @@ class TimingMultiDiGraph(TimingMultiGraph,TimingDiGraph):
             Remove an edge between nodes u and v.
         key : hashable identifier, optional (default=None)
             Used to distinguish multiple edges between a pair of nodes.
-            If None remove a single (abritrary) edge between u and v.
+            If None remove a single (arbitrary) edge between u and v.
 
         Raises
         ------

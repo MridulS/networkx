@@ -57,17 +57,15 @@ Eigenvector
    katz_centrality
    katz_centrality_numpy
 
-Communicability
----------------
+Subgraph
+--------
 .. autosummary::
    :toctree: generated/
 
-   communicability
-   communicability_exp
-   communicability_centrality
-   communicability_centrality_exp
    communicability_betweenness_centrality
    estrada_index
+   subgraph_centrality
+   subgraph_centrality_exp
 
 Load
 ----
@@ -75,7 +73,7 @@ Load
    :toctree: generated/
 
    load_centrality
-   edge_load
+   edge_load_centrality
 
 Dispersion
 ----------
@@ -90,3 +88,11 @@ Harmonic Centrality
    :toctree: generated/
 
    harmonic_centrality
+
+Reaching
+--------
+.. autosummary::
+   :toctree: generated/
+
+   local_reaching_centrality
+   global_reaching_centrality
