@@ -1,5 +1,5 @@
 NetworkX
---------
+========
 
 NetworkX is a Python package for the creation, manipulation, and
 study of the structure, dynamics, and functions of complex networks.
@@ -8,8 +8,6 @@ Documentation
    http://networkx.github.io
 Mailing List
    https://groups.google.com/forum/#!forum/networkx-discuss
-IRC
-   `irc://chat.freenode.net/networkx`_ (for a web client click `here`_)
 Development
    https://github.com/networkx/networkx
 
@@ -24,6 +22,31 @@ Development
       :target: https://coveralls.io/r/networkx/networkx?branch=master
 
 
+Download
+--------
+
+Get the latest version of NetworkX from
+https://pypi.python.org/pypi/networkx/
+
+::
+
+    $ pip install networkx
+
+To get the git version do
+
+::
+
+    $ git clone git://github.com/networkx/networkx.git
+
+Decorator package is required for NetworkX.
+
+::
+
+    $ pip install decorator
+
+Usage
+-----
+
 A quick example that finds the shortest path between two nodes in an undirected graph::
 
    >>> import networkx as nx
@@ -35,12 +58,24 @@ A quick example that finds the shortest path between two nodes in an undirected 
    >>> nx.shortest_path(G, 'A', 'D', weight='weight')
    ['A', 'B', 'D']
 
+
+Bugs
+----
+
+Our issue tracker is at https://github.com/networkx/networkx/issues.
+Please report any bugs that you find.  Or, even better, fork the repository on
+GitHub and create a pull request.  We welcome all changes, big or small, and we
+will help you make the pull request if you are new to git
+(just ask on the issue).
+
+License
+-------
+
 Distributed with a BSD license; see LICENSE.txt::
 
-   Copyright (C) 2004-2015 NetworkX Developers
+   Copyright (C) 2004-2016 NetworkX Developers
    Aric Hagberg <hagberg@lanl.gov>
    Dan Schult <dschult@colgate.edu>
    Pieter Swart <swart@lanl.gov>
 
-.. _irc://chat.freenode.net/networkx: irc://chat.freenode.net/networkx
 .. _here: http://webchat.freenode.net?channels=%23networkx

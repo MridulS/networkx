@@ -1,58 +1,43 @@
-"""
-    Unit tests for pydot drawing functions.
-"""
+"""Unit tests for pydot drawing functions."""
 import os
 import tempfile
-
 from nose import SkipTest
 from nose.tools import assert_true
-
 import networkx as nx
+from networkx.testing import assert_graphs_equal
+
 
 class TestPydot(object):
     @classmethod
     def setupClass(cls):
-        global pydot
+        global pydotplus
         try:
-            pydot = nx.drawing.nx_pydot.load_pydot()
+            import pydotplus
         except ImportError:
-            raise SkipTest('pydot not available.')
-
-    def build_graph(self, G):
-        G.add_edge('A','B')
-        G.add_edge('A','C')
-        G.add_edge('B','C')
-        G.add_edge('A','D')
-        G.add_node('E')
-        return G, nx.to_pydot(G)
-
-    def assert_equal(self, G1, G2):
-        assert_true( sorted(G1.nodes())==sorted(G2.nodes()) )
-        assert_true( sorted(G1.edges())==sorted(G2.edges()) )
+            raise SkipTest('pydotplus not available.')
 
     def pydot_checks(self, G):
-        H, P = self.build_graph(G)
-        G2 = H.__class__(nx.from_pydot(P))
-        self.assert_equal(H, G2)
+        G.add_edges_from([('A','B'),('A','C'),('B','C'),('A','D')])
+        G.add_node('E')
+        P = nx.nx_pydot.to_pydot(G)
+        G2 = G.__class__(nx.nx_pydot.from_pydot(P))
+        assert_graphs_equal(G, G2)
 
         fname = tempfile.mktemp()
-        assert_true( P.write_raw(fname) )
-
-        Pin = pydot.graph_from_dot_file(fname)
+        assert_true(P.write_raw(fname))
+        Pin = pydotplus.graph_from_dot_file(fname)
 
         n1 = sorted([p.get_name() for p in P.get_node_list()])
         n2 = sorted([p.get_name() for p in Pin.get_node_list()])
-        assert_true( n1 == n2 )
+        assert_true(n1 == n2)
 
-        e1=[(e.get_source(),e.get_destination()) for e in P.get_edge_list()]
-        e2=[(e.get_source(),e.get_destination()) for e in Pin.get_edge_list()]
-        assert_true( sorted(e1)==sorted(e2) )
+        e1 = [(e.get_source(),e.get_destination()) for e in P.get_edge_list()]
+        e2 = [(e.get_source(),e.get_destination()) for e in Pin.get_edge_list()]
+        assert_true(sorted(e1) == sorted(e2))
 
-        Hin = nx.drawing.nx_pydot.read_dot(fname)
-        Hin = H.__class__(Hin)
-        self.assert_equal(H, Hin)
-#        os.unlink(fname)
-
+        Hin = nx.nx_pydot.read_dot(fname)
+        Hin = G.__class__(Hin)
+        assert_graphs_equal(G, Hin)
 
     def testUndirected(self):
         self.pydot_checks(nx.Graph())

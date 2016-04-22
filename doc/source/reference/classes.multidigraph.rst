@@ -30,9 +30,6 @@ Adding and Removing Nodes and Edges
    MultiDiGraph.add_weighted_edges_from
    MultiDiGraph.remove_edge
    MultiDiGraph.remove_edges_from
-   MultiDiGraph.add_star
-   MultiDiGraph.add_path
-   MultiDiGraph.add_cycle
    MultiDiGraph.clear
 
 
@@ -88,6 +85,6 @@ Making copies and subgraphs
    MultiDiGraph.copy
    MultiDiGraph.to_undirected
    MultiDiGraph.to_directed
+   MultiDiGraph.edge_subgraph
    MultiDiGraph.subgraph
    MultiDiGraph.reverse
-

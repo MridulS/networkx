@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Algorithms for directed acyclic graphs (DAGs)."""
-#    Copyright (C) 2006-2015 by
+#    Copyright (C) 2006-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -111,7 +111,7 @@ def topological_sort(G):
     ------
     NetworkXError
         Topological sort is defined for directed graphs only. If the graph G
-        is undirected, a NetworkXError is raised.
+        is undirected, a :exc:`NetworkXError` is raised.
 
     NetworkXUnfeasible
         If G is not a directed acyclic graph (DAG) no topological sort exists
@@ -122,12 +122,12 @@ def topological_sort(G):
         If G is changed while the returned iterator is being processed.
 
     Examples
-    ---------
+    --------
     To get the reverse order of the topological sort::
 
-    >>> DG = nx.DiGraph([(1, 2), (2, 3)])
-    >>> list(reversed(list(nx.topological_sort(DG))))
-    [3, 2, 1]
+        >>> DG = nx.DiGraph([(1, 2), (2, 3)])
+        >>> list(reversed(list(nx.topological_sort(DG))))
+        [3, 2, 1]
 
     Notes
     -----
@@ -197,7 +197,7 @@ def lexicographical_topological_sort(G, key=None):
     ------
     NetworkXError
         Topological sort is defined for directed graphs only. If the graph G
-        is undirected, a NetworkXError is raised.
+        is undirected, a :exc:`NetworkXError` is raised.
 
     NetworkXUnfeasible
         If G is not a directed acyclic graph (DAG) no topological sort exists

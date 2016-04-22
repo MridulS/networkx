@@ -1,5 +1,5 @@
 """Base class for MultiGraph."""
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -32,11 +32,11 @@ class MultiGraph(Graph):
     Parameters
     ----------
     data : input graph
-        Data to initialize graph.  If data=None (default) an empty
-        graph is created.  The data can be an edge list, or any
-        NetworkX graph object.  If the corresponding optional Python
-        packages are installed the data can also be a NumPy matrix
-        or 2d ndarray, a SciPy sparse matrix, or a PyGraphviz graph.
+        Data to initialize graph. If data=None (default) an empty
+        graph is created.  The data can be any format that is supported
+        by the to_networkx_graph() function, currently including edge list,
+        dict of dicts, dict of lists, NetworkX graph, NumPy matrix
+        or 2d ndarray, SciPy sparse matrix, or PyGraphviz graph.
 
     attr : keyword arguments, optional (default= no attributes)
         Attributes to add to graph as key=value pairs.
@@ -67,8 +67,7 @@ class MultiGraph(Graph):
 
     >>> G.add_nodes_from([2,3])
     >>> G.add_nodes_from(range(100,110))
-    >>> H=nx.Graph()
-    >>> H.add_path([0,1,2,3,4,5,6,7,8,9])
+    >>> H=nx.path_graph(10)
     >>> G.add_nodes_from(H)
 
     In addition to strings and integers any hashable Python object
@@ -365,7 +364,6 @@ class MultiGraph(Graph):
             Edge data (or labels or objects) can be assigned using
             keyword arguments.
 
-
         See Also
         --------
         add_edge : add a single edge
@@ -429,7 +427,7 @@ class MultiGraph(Graph):
             Remove an edge between nodes u and v.
         key : hashable identifier, optional (default=None)
             Used to distinguish multiple edges between a pair of nodes.
-            If None remove a single (abritrary) edge between u and v.
+            If None remove a single (arbitrary) edge between u and v.
 
         Raises
         ------
@@ -444,7 +442,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.MultiGraph()
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.remove_edge(0,1)
         >>> e = (1,2)
         >>> G.remove_edge(*e) # unpacks e from an edge tuple
@@ -507,8 +505,7 @@ class MultiGraph(Graph):
 
         Examples
         --------
-        >>> G = nx.MultiGraph() # or MultiDiGraph
-        >>> G.add_path([0,1,2,3])
+        >>> G = nx.path_graph(4)  # or DiGraph, MultiGraph, MultiDiGraph, etc
         >>> ebunch=[(1,2),(2,3)]
         >>> G.remove_edges_from(ebunch)
 
@@ -552,7 +549,7 @@ class MultiGraph(Graph):
         or an edge tuple (u,v,key).
 
         >>> G = nx.MultiGraph()   # or MultiDiGraph
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.has_edge(0,1)  # using two nodes
         True
         >>> e = (0,1)
@@ -569,7 +566,7 @@ class MultiGraph(Graph):
 
         >>> G.has_edge(0,1)
         True
-        >>> 1 in G[0]  # though this gives KeyError if 0 not in G
+        >>> 1 in G[0]  # though this gives :exc:`KeyError` if 0 not in G
         True
 
 
@@ -618,7 +615,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.MultiGraph()   # or MultiDiGraph
-        >>> G.add_path([0,1,2])
+        >>> nx.add_path(G, [0, 1, 2])
         >>> G.add_edge(2,3,weight=5)
         >>> [e for e in G.edges()]
         [(0, 1), (1, 2), (2, 3)]
@@ -707,7 +704,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.MultiGraph() # or MultiDiGraph
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.get_edge_data(0,1)
         {0: {}}
         >>> e = (0,1)
@@ -755,7 +752,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.Graph()   # or DiGraph, MultiGraph, MultiDiGraph, etc
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.degree(0) # node 0 with degree 1
         1
         >>> list(G.degree([0,1]))
@@ -833,7 +830,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.Graph()   # or MultiGraph, etc
-        >>> G.add_path([0,1])
+        >>> G.add_edge(0, 1)
         >>> H = G.to_directed()
         >>> list(H.edges())
         [(0, 1), (1, 0)]
@@ -841,7 +838,7 @@ class MultiGraph(Graph):
         If already directed, return a (deep) copy
 
         >>> G = nx.DiGraph()   # or MultiDiGraph, etc
-        >>> G.add_path([0,1])
+        >>> G.add_edge(0, 1)
         >>> H = G.to_directed()
         >>> list(H.edges())
         [(0, 1)]
@@ -947,7 +944,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.Graph()   # or DiGraph, MultiGraph, MultiDiGraph, etc
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.number_of_edges()
         3
         >>> G.number_of_edges(0,1)
@@ -997,7 +994,7 @@ class MultiGraph(Graph):
         Examples
         --------
         >>> G = nx.Graph()   # or DiGraph, MultiGraph, MultiDiGraph, etc
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> H = G.subgraph([0,1,2])
         >>> list(H.edges())
         [(0, 1), (1, 2)]
@@ -1022,5 +1019,90 @@ class MultiGraph(Graph):
                     ed = edgedict.copy()
                     Hnbrs[nbr] = ed
                     H_adj[nbr][n] = ed
+        H.graph = self.graph
+        return H
+
+    def edge_subgraph(self, edges):
+        """Returns the subgraph induced by the specified edges.
+
+        The induced subgraph contains each edge in `edges` and each
+        node incident to any one of those edges.
+
+        Parameters
+        ----------
+        edges : iterable
+            An iterable of edges in this graph.
+
+        Returns
+        -------
+        G : Graph
+            An edge-induced subgraph of this graph with the same edge
+            attributes.
+
+        Notes
+        -----
+        The graph, edge, and node attributes in the returned subgraph
+        are references to the corresponding attributes in the original
+        graph. Thus changes to the node or edge structure of the
+        returned graph will not be reflected in the original graph, but
+        changes to the attributes will.
+
+        To create a subgraph with its own copy of the edge or node
+        attributes, use::
+
+            >>> nx.MultiGraph(G.edge_subgraph(edges))  # doctest: +SKIP
+
+        If edge attributes are containers, a deep copy of the attributes
+        can be obtained using::
+
+            >>> G.edge_subgraph(edges).copy()  # doctest: +SKIP
+
+        Examples
+        --------
+        Get a subgraph induced by only those edges that have a certain
+        attribute::
+
+            >>> # Create a graph in which some edges are "good" and some "bad".
+            >>> G = nx.MultiGraph()
+            >>> G.add_edge(0, 1, key=0, good=True)
+            >>> G.add_edge(0, 1, key=1, good=False)
+            >>> G.add_edge(1, 2, key=0, good=False)
+            >>> G.add_edge(1, 2, key=1, good=True)
+            >>> # Keep only those edges that are marked as "good".
+            >>> edges = G.edges(keys=True, data='good')
+            >>> edges = ((u, v, k) for (u, v, k, good) in edges if good)
+            >>> H = G.edge_subgraph(edges)
+            >>> list(H.edges(keys=True, data=True))
+            [(0, 1, 0, {'good': True}), (1, 2, 1, {'good': True})]
+
+        """
+        H = self.__class__()
+        adj = self.adj
+        # Filter out edges that don't correspond to nodes in the graph.
+        def is_in_graph(u, v, k):
+            return u in adj and v in adj[u] and k in adj[u][v]
+        edges = (e for e in edges if is_in_graph(*e))
+        for u, v, k in edges:
+            # Copy the node attributes if they haven't been copied
+            # already.
+            if u not in H.node:
+                H.node[u] = self.node[u]
+            if v not in H.node:
+                H.node[v] = self.node[v]
+            # Create an entry in the adjacency dictionary for the
+            # nodes u and v if they don't exist yet.
+            if u not in H.adj:
+                H.adj[u] = H.adjlist_dict_factory()
+            if v not in H.adj:
+                H.adj[v] = H.adjlist_dict_factory()
+            # Create an entry in the edge dictionary for the edges (u,
+            # v) and (v, u) if the don't exist yet.
+            if v not in H.adj[u]:
+                H.adj[u][v] = H.edge_key_dict_factory()
+            if u not in H.adj[v]:
+                H.adj[v][u] = H.edge_key_dict_factory()
+            # Copy the edge attributes.
+            H.edge[u][v][k] = self.edge[u][v][k]
+            H.edge[v][u][k] = self.edge[v][u][k]
         H.graph = self.graph
         return H

@@ -1,5 +1,5 @@
 """Base class for MultiDiGraph."""
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -33,11 +33,11 @@ class MultiDiGraph(MultiGraph,DiGraph):
     Parameters
     ----------
     data : input graph
-        Data to initialize graph.  If data=None (default) an empty
-        graph is created.  The data can be an edge list, or any
-        NetworkX graph object.  If the corresponding optional Python
-        packages are installed the data can also be a NumPy matrix
-        or 2d ndarray, a SciPy sparse matrix, or a PyGraphviz graph.
+        Data to initialize graph. If data=None (default) an empty
+        graph is created.  The data can be any format that is supported
+        by the to_networkx_graph() function, currently including edge list,
+        dict of dicts, dict of lists, NetworkX graph, NumPy matrix
+        or 2d ndarray, SciPy sparse matrix, or PyGraphviz graph.
 
     attr : keyword arguments, optional (default= no attributes)
         Attributes to add to graph as key=value pairs.
@@ -68,8 +68,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
 
     >>> G.add_nodes_from([2,3])
     >>> G.add_nodes_from(range(100,110))
-    >>> H=nx.Graph()
-    >>> H.add_path([0,1,2,3,4,5,6,7,8,9])
+    >>> H=nx.path_graph(10)
     >>> G.add_nodes_from(H)
 
     In addition to strings and integers any hashable Python object
@@ -355,7 +354,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
             Remove an edge between nodes u and v.
         key : hashable identifier, optional (default=None)
             Used to distinguish multiple edges between a pair of nodes.
-            If None remove a single (abritrary) edge between u and v.
+            If None remove a single (arbitrary) edge between u and v.
 
         Raises
         ------
@@ -370,7 +369,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.remove_edge(0,1)
         >>> e = (1,2)
         >>> G.remove_edge(*e) # unpacks e from an edge tuple
@@ -442,7 +441,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1,2])
+        >>> nx.add_path(G, [0, 1, 2])
         >>> G.add_edge(2,3,weight=5)
         >>> [e for e in G.edges()]
         [(0, 1), (1, 2), (2, 3)]
@@ -569,7 +568,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.degree(0) # node 0 with degree 1
         1
         >>> list(G.degree([0,1]))
@@ -652,7 +651,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.in_degree(0) # node 0 with degree 0
         0
         >>> list(G.in_degree([0,1]))
@@ -722,7 +721,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1,2,3])
+        >>> nx.add_path(G, [0, 1, 2, 3])
         >>> G.out_degree(0) # node 0 with degree 1
         1
         >>> list(G.out_degree([0,1]))
@@ -793,7 +792,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         Examples
         --------
         >>> G = nx.Graph()   # or MultiGraph, etc
-        >>> G.add_path([0,1])
+        >>> G.add_edge(0, 1)
         >>> H = G.to_directed()
         >>> list(H.edges())
         [(0, 1), (1, 0)]
@@ -801,7 +800,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
         If already directed, return a (deep) copy
 
         >>> G = nx.MultiDiGraph()
-        >>> G.add_path([0,1])
+        >>> G.add_edge(0, 1)
         >>> H = G.to_directed()
         >>> list(H.edges())
         [(0, 1)]
@@ -895,8 +894,7 @@ class MultiDiGraph(MultiGraph,DiGraph):
 
         Examples
         --------
-        >>> G = nx.Graph()   # or DiGraph, MultiGraph, MultiDiGraph, etc
-        >>> G.add_path([0,1,2,3])
+        >>> G = nx.path_graph(4)  # or DiGraph, MultiGraph, MultiDiGraph, etc
         >>> H = G.subgraph([0,1,2])
         >>> list(H.edges())
         [(0, 1), (1, 2)]
@@ -926,6 +924,91 @@ class MultiDiGraph(MultiGraph,DiGraph):
                     ed = edgedict.copy()
                     Hnbrs[v] = ed
                     H_pred[v][u] = ed
+        H.graph = self.graph
+        return H
+
+    def edge_subgraph(self, edges):
+        """Returns the subgraph induced by the specified edges.
+
+        The induced subgraph contains each edge in `edges` and each
+        node incident to any one of those edges.
+
+        Parameters
+        ----------
+        edges : iterable
+            An iterable of edges in this graph.
+
+        Returns
+        -------
+        G : Graph
+            An edge-induced subgraph of this graph with the same edge
+            attributes.
+
+        Notes
+        -----
+        The graph, edge, and node attributes in the returned subgraph
+        are references to the corresponding attributes in the original
+        graph. Thus changes to the node or edge structure of the
+        returned graph will not be reflected in the original graph, but
+        changes to the attributes will.
+
+        To create a subgraph with its own copy of the edge or node
+        attributes, use::
+
+            >>> nx.MultiDiGraph(G.edge_subgraph(edges))  # doctest: +SKIP
+
+        If edge attributes are containers, a deep copy of the attributes
+        can be obtained using::
+
+            >>> G.edge_subgraph(edges).copy()  # doctest: +SKIP
+
+        Examples
+        --------
+        Get a subgraph induced by only those edges that have a certain
+        attribute::
+
+            >>> # Create a graph in which some edges are "good" and some "bad".
+            >>> G = nx.MultiDiGraph()
+            >>> G.add_edge(0, 1, key=0, good=True)
+            >>> G.add_edge(0, 1, key=1, good=False)
+            >>> G.add_edge(1, 2, key=0, good=False)
+            >>> G.add_edge(1, 2, key=1, good=True)
+            >>> # Keep only those edges that are marked as "good".
+            >>> edges = G.edges(keys=True, data='good')
+            >>> edges = ((u, v, k) for (u, v, k, good) in edges if good)
+            >>> H = G.edge_subgraph(edges)
+            >>> list(H.edges(keys=True, data=True))
+            [(0, 1, 0, {'good': True}), (1, 2, 1, {'good': True})]
+
+        """
+        H = self.__class__()
+        succ = self.succ
+        # Filter out edges that don't correspond to nodes in the graph.
+        def is_in_graph(u, v, k):
+            return u in succ and v in succ[u] and k in succ[u][v]
+        edges = (e for e in edges if is_in_graph(*e))
+        for u, v, k in edges:
+            # Copy the node attributes if they haven't been copied
+            # already.
+            if u not in H.node:
+                H.node[u] = self.node[u]
+            if v not in H.node:
+                H.node[v] = self.node[v]
+            # Create an entry in the successors and predecessors
+            # dictionary for the nodes u and v if they don't exist yet.
+            if u not in H.succ:
+                H.succ[u] = H.adjlist_dict_factory()
+            if v not in H.pred:
+                H.pred[v] = H.adjlist_dict_factory()
+            # Create an entry in the edge dictionary for the edges (u,
+            # v) and (v, u) if the don't exist yet.
+            if v not in H.succ[u]:
+                H.succ[u][v] = H.edge_key_dict_factory()
+            if u not in H.pred[v]:
+                H.pred[v][u] = H.edge_key_dict_factory()
+            # Copy the edge attributes.
+            H.edge[u][v][k] = self.edge[u][v][k]
+            H.pred[v][u][k] = self.pred[v][u][k]
         H.graph = self.graph
         return H
 

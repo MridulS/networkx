@@ -4,7 +4,7 @@
 Bipartite Graph Algorithms
 ==========================
 """
-#    Copyright (C) 2013-2015 by
+#    Copyright (C) 2013-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -37,7 +37,7 @@ def color(G):
 
     Raises
     ------
-    NetworkXError if the graph is not two-colorable.
+    exc:`NetworkXError` if the graph is not two-colorable.
 
     Examples
     --------

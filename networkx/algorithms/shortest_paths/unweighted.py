@@ -3,7 +3,7 @@
 Shortest path algorithms for unweighted graphs.
 """
 __author__ = """Aric Hagberg (hagberg@lanl.gov)"""
-#    Copyright (C) 2004-2015 by
+#    Copyright (C) 2004-2016 by
 #    Aric Hagberg <hagberg@lanl.gov>
 #    Dan Schult <dschult@colgate.edu>
 #    Pieter Swart <swart@lanl.gov>
@@ -66,7 +66,7 @@ def single_source_shortest_path_length(G,source,cutoff=None):
 
 
 def all_pairs_shortest_path_length(G, cutoff=None):
-    """Computes the shortest path lengths between all nodes in ``G``.
+    """Computes the shortest path lengths between all nodes in `G`.
 
     Parameters
     ----------
@@ -74,7 +74,7 @@ def all_pairs_shortest_path_length(G, cutoff=None):
 
     cutoff : integer, optional
         Depth at which to stop the search. Only paths of length at most
-        ``cutoff`` are returned.
+        `cutoff` are returned.
 
     Returns
     -------
@@ -264,7 +264,7 @@ def all_pairs_shortest_path(G, cutoff=None):
 
     cutoff : integer, optional
         Depth at which to stop the search. Only paths of length at most
-        ``cutoff`` are returned.
+        `cutoff` are returned.
 
     Returns
     -------

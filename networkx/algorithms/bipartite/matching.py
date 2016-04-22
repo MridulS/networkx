@@ -45,6 +45,7 @@ import collections
 import itertools
 
 from networkx.algorithms.bipartite import sets as bipartite_sets
+import networkx as nx
 
 __all__ = ['maximum_matching', 'hopcroft_karp_matching', 'eppstein_matching',
            'to_vertex_cover']
@@ -66,7 +67,7 @@ def hopcroft_karp_matching(G):
     matches : dictionary
 
       The matching is returned as a dictionary, `matches`, such that
-      ``matches[v] == w`` if node ``v`` is matched to node ``w``. Unmatched
+      ``matches[v] == w`` if node `v` is matched to node `w`. Unmatched
       nodes do not occur as a key in mate.
 
     Notes
@@ -165,8 +166,8 @@ def eppstein_matching(G):
     -------
     matches : dictionary
 
-      The matching is returned as a dictionary, `matches`, such that
-      ``matches[v] == w`` if node ``v`` is matched to node ``w``. Unmatched
+      The matching is returned as a dictionary, `matching`, such that
+      ``matching[v] == w`` if node `v` is matched to node `w`. Unmatched
       nodes do not occur as a key in mate.
 
     Notes
@@ -183,6 +184,10 @@ def eppstein_matching(G):
     hopcroft_karp_matching
 
     """
+    # Due to its original implementation, a directed graph is needed
+    # so that the two sets of bipartite nodes can be distinguished
+    left = bipartite_sets(G)[0]
+    G = nx.DiGraph(G.edges(left))
     # initialize greedy matching (redundant, but faster than full search)
     matching = {}
     for u in G:
@@ -190,7 +195,6 @@ def eppstein_matching(G):
             if v not in matching:
                 matching[v] = u
                 break
-
     while True:
         # structure residual graph into layers
         # pred[u] gives the neighbor in the previous layer for u in U
@@ -243,6 +247,10 @@ def eppstein_matching(G):
             # seems to be the case, they don't really need to be returned,
             # since that information can be inferred from the matching
             # dictionary.
+
+            # All the matched nodes must be a key in the dictionary
+            for key in matching.copy():
+                matching[matching[key]] = key
             return matching
 
         # recursively search backward through layers to find alternating paths
@@ -263,7 +271,7 @@ def eppstein_matching(G):
 
 
 def _is_connected_by_alternating_path(G, v, matching, targets):
-    """Returns ``True`` if and only if the vertex `v` is connected to one of
+    """Returns True if and only if the vertex `v` is connected to one of
     the target vertices by an alternating path in `G`.
 
     An *alternating path* is a path in which every other edge is in the
@@ -289,7 +297,7 @@ def _is_connected_by_alternating_path(G, v, matching, targets):
     unmatched_edges = set(G.edges()) - matched_edges
 
     def _alternating_dfs(u, depth, along_matched=True):
-        """Returns ``True`` if and only if `u` is connected to one of the
+        """Returns True if and only if `u` is connected to one of the
         targets by an alternating path.
 
         `u` is a vertex in the graph `G`.
@@ -297,7 +305,7 @@ def _is_connected_by_alternating_path(G, v, matching, targets):
         `depth` specifies the maximum recursion depth of the depth-first
         search.
 
-        If `along_matched` is ``True``, this step of the depth-first search
+        If `along_matched` is True, this step of the depth-first search
         will continue only through edges in the given matching. Otherwise, it
         will continue only through edges *not* in the given matching.
 
@@ -328,8 +336,8 @@ def _is_connected_by_alternating_path(G, v, matching, targets):
     # check for alternating paths starting with edges not in the
     # matching. Initiate the depth-first search with the current depth equal to
     # the number of nodes in the graph.
-    return (_alternating_dfs(v, len(G), along_matched=True)
-            or _alternating_dfs(v, len(G), along_matched=False))
+    return (_alternating_dfs(v, len(G), along_matched=True) or
+            _alternating_dfs(v, len(G), along_matched=False))
 
 
 def _connected_by_alternating_paths(G, matching, targets):

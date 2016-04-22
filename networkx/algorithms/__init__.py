@@ -3,6 +3,7 @@ from networkx.algorithms.boundary import *
 from networkx.algorithms.centrality import *
 from networkx.algorithms.cluster import *
 from networkx.algorithms.clique import *
+from networkx.algorithms.communicability_alg import *
 from networkx.algorithms.community import *
 from networkx.algorithms.components import *
 from networkx.algorithms.coloring import *
@@ -13,6 +14,7 @@ from networkx.algorithms.dag import *
 from networkx.algorithms.distance_measures import *
 from networkx.algorithms.dominance import *
 from networkx.algorithms.dominating import *
+from networkx.algorithms.efficiency import *
 from networkx.algorithms.hierarchy import *
 from networkx.algorithms.hybrid import *
 from networkx.algorithms.matching import *
@@ -35,6 +37,7 @@ from networkx.algorithms.distance_regular import *
 from networkx.algorithms.swap import *
 from networkx.algorithms.graphical import *
 from networkx.algorithms.simple_paths import *
+from networkx.algorithms.voronoi import *
 from networkx.algorithms.wiener import *
 
 import networkx.algorithms.assortativity
