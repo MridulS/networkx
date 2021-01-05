@@ -1,3 +1,7 @@
+---
+name: Bug report
+---
+
 <!-- If you have a general question about NetworkX, please use the discussions tab to create a new discussion -->
 
 <!--- Provide a general summary of the issue in the Title above -->
