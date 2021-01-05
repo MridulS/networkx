@@ -236,8 +236,7 @@ class DiGraph(Graph):
         Class to create a new graph structure in the `to_undirected` method.
         If `None`, a NetworkX class (Graph or MultiGraph) is used.
 
-    Examples
-    --------
+    **Subclassing Example**
 
     Create a low memory graph class that effectively disallows edge
     attributes by using a single attribute dict for all edges.
@@ -245,10 +244,10 @@ class DiGraph(Graph):
 
     >>> class ThinGraph(nx.Graph):
     ...     all_edge_dict = {"weight": 1}
-    ... 
+    ...
     ...     def single_edge_dict(self):
     ...         return self.all_edge_dict
-    ... 
+    ...
     ...     edge_attr_dict_factory = single_edge_dict
     >>> G = ThinGraph()
     >>> G.add_edge(2, 1)
@@ -467,30 +466,19 @@ class DiGraph(Graph):
 
         """
         for n in nodes_for_adding:
-            # keep all this inside try/except because
-            # CPython throws TypeError on n not in self._succ,
-            # while pre-2.7.5 ironpython throws on self._succ[n]
             try:
-                if n not in self._succ:
-                    self._succ[n] = self.adjlist_inner_dict_factory()
-                    self._pred[n] = self.adjlist_inner_dict_factory()
-                    attr_dict = self._node[n] = self.node_attr_dict_factory()
-                    attr_dict.update(attr)
-                else:
-                    self._node[n].update(attr)
+                newnode = n not in self._node
+                newdict = attr
             except TypeError:
-                nn, ndict = n
-                if nn not in self._succ:
-                    self._succ[nn] = self.adjlist_inner_dict_factory()
-                    self._pred[nn] = self.adjlist_inner_dict_factory()
-                    newdict = attr.copy()
-                    newdict.update(ndict)
-                    attr_dict = self._node[nn] = self.node_attr_dict_factory()
-                    attr_dict.update(newdict)
-                else:
-                    olddict = self._node[nn]
-                    olddict.update(attr)
-                    olddict.update(ndict)
+                n, ndict = n
+                newnode = n not in self._node
+                newdict = attr.copy()
+                newdict.update(ndict)
+            if newnode:
+                self._succ[n] = self.adjlist_inner_dict_factory()
+                self._pred[n] = self.adjlist_inner_dict_factory()
+                self._node[n] = self.node_attr_dict_factory()
+            self._node[n].update(newdict)
 
     def remove_node(self, n):
         """Remove node n.
@@ -504,7 +492,7 @@ class DiGraph(Graph):
            A node in the graph
 
         Raises
-        -------
+        ------
         NetworkXError
            If n is not in the graph.
 
@@ -789,7 +777,7 @@ class DiGraph(Graph):
            A node in the graph
 
         Raises
-        -------
+        ------
         NetworkXError
            If n is not in the graph.
 
@@ -821,7 +809,7 @@ class DiGraph(Graph):
            A node in the graph
 
         Raises
-        -------
+        ------
         NetworkXError
            If n is not in the graph.
 

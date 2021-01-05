@@ -307,7 +307,7 @@ def _max_cardinality_node(G, choices, wanna_connect):
 
 
 def _find_chordality_breaker(G, s=None, treewidth_bound=sys.maxsize):
-    """ Given a graph G, starts a max cardinality search
+    """Given a graph G, starts a max cardinality search
     (starting from s if s is given and from an arbitrary node otherwise)
     trying to find a non-chordal cycle.
 
@@ -438,7 +438,7 @@ def complete_to_chordal_graph(G):
             The elimination ordering of nodes of G
 
     Notes
-    ------
+    -----
     There are different approaches to calculate the chordal
     enhancement of a graph. The algorithm used here is called
     MCS-M and gives at least minimal (local) triangulation of graph. Note

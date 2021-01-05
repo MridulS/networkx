@@ -61,7 +61,7 @@ def triangles(G, nodes=None):
 
 @not_implemented_for("multigraph")
 def _triangles_and_degree_iter(G, nodes=None):
-    """ Return an iterator of (node, degree, triangles, generalized degree).
+    """Return an iterator of (node, degree, triangles, generalized degree).
 
     This double counts triangles so you may want to divide by 2.
     See degree(), triangles() and generalized_degree() for definitions
@@ -82,9 +82,12 @@ def _triangles_and_degree_iter(G, nodes=None):
 
 @not_implemented_for("multigraph")
 def _weighted_triangles_and_degree_iter(G, nodes=None, weight="weight"):
-    """ Return an iterator of (node, degree, weighted_triangles).
+    """Return an iterator of (node, degree, weighted_triangles).
 
     Used for weighted clustering.
+    Note: this returns the geometric average weight of edges in the triangle.
+    Also, each triangle is counted twice (each direction).
+    So you may want to divide by 2.
 
     """
     if weight is None or G.number_of_edges() == 0:
@@ -105,7 +108,7 @@ def _weighted_triangles_and_degree_iter(G, nodes=None, weight="weight"):
         seen = set()
         for j in inbrs:
             seen.add(j)
-            # This prevents double counting.
+            # This avoids counting twice -- we double at the end.
             jnbrs = set(G[j]) - seen
             # Only compute the edge weight once, before the inner inner
             # loop.
@@ -118,10 +121,12 @@ def _weighted_triangles_and_degree_iter(G, nodes=None, weight="weight"):
 
 @not_implemented_for("multigraph")
 def _directed_triangles_and_degree_iter(G, nodes=None):
-    """ Return an iterator of
+    """Return an iterator of
     (node, total_degree, reciprocal_degree, directed_triangles).
 
     Used for directed clustering.
+    Note that unlike `_triangles_and_degree_iter()`, this function counts
+    directed triangles so does not count triangles twice.
 
     """
     nodes_nbrs = ((n, G._pred[n], G._succ[n]) for n in G.nbunch_iter(nodes))
@@ -150,10 +155,12 @@ def _directed_triangles_and_degree_iter(G, nodes=None):
 
 @not_implemented_for("multigraph")
 def _directed_weighted_triangles_and_degree_iter(G, nodes=None, weight="weight"):
-    """ Return an iterator of
+    """Return an iterator of
     (node, total_degree, reciprocal_degree, directed_weighted_triangles).
 
     Used for directed weighted clustering.
+    Note that unlike `_weighted_triangles_and_degree_iter()`, this function counts
+    directed triangles so does not count triangles twice.
 
     """
     if weight is None or G.number_of_edges() == 0:
@@ -300,7 +307,7 @@ def clustering(G, nodes=None, weight=None):
 
     .. math::
 
-       c_u = \frac{1}{deg^{tot}(u)(deg^{tot}(u)-1) - 2deg^{\leftrightarrow}(u)}
+       c_u = \frac{2}{deg^{tot}(u)(deg^{tot}(u)-1) - 2deg^{\leftrightarrow}(u)}
              T(u),
 
     where :math:`T(u)` is the number of directed triangles through node
@@ -362,6 +369,7 @@ def clustering(G, nodes=None, weight=None):
                 for v, dt, db, t in td_iter
             }
     else:
+        # The formula 2*T/(d*(d-1)) from docs is t/(d*(d-1)) here b/c t==2*T
         if weight is not None:
             td_iter = _weighted_triangles_and_degree_iter(G, nodes, weight)
             clusterc = {v: 0 if t == 0 else t / (d * (d - 1)) for v, d, t in td_iter}
@@ -402,13 +410,18 @@ def transitivity(G):
     >>> print(nx.transitivity(G))
     1.0
     """
-    triangles = sum(t for v, d, t, _ in _triangles_and_degree_iter(G))
-    contri = sum(d * (d - 1) for v, d, t, _ in _triangles_and_degree_iter(G))
+    triangles_contri = [
+        (t, d * (d - 1)) for v, d, t, _ in _triangles_and_degree_iter(G)
+    ]
+    # If the graph is empty
+    if len(triangles_contri) == 0:
+        return 0
+    triangles, contri = map(sum, zip(*triangles_contri))
     return 0 if triangles == 0 else triangles / contri
 
 
 def square_clustering(G, nodes=None):
-    r""" Compute the squares clustering coefficient for nodes.
+    r"""Compute the squares clustering coefficient for nodes.
 
     For each node return the fraction of possible squares that exist at
     the node [1]_
@@ -420,9 +433,9 @@ def square_clustering(G, nodes=None):
 
     where :math:`q_v(u,w)` are the number of common neighbors of :math:`u` and
     :math:`w` other than :math:`v` (ie squares), and :math:`a_v(u,w) = (k_u -
-    (1+q_v(u,w)+\theta_{uv}))(k_w - (1+q_v(u,w)+\theta_{uw}))`, where
+    (1+q_v(u,w)+\theta_{uv})) + (k_w - (1+q_v(u,w)+\theta_{uw}))`, where
     :math:`\theta_{uw} = 1` if :math:`u` and :math:`w` are connected and 0
-    otherwise.
+    otherwise. [2]_
 
     Parameters
     ----------
@@ -457,6 +470,9 @@ def square_clustering(G, nodes=None):
     .. [1] Pedro G. Lind, Marta C. González, and Hans J. Herrmann. 2005
         Cycles and clustering in bipartite networks.
         Physical Review E (72) 056127.
+    .. [2] Zhang, Peng et al. Clustering Coefficient and Community Structure of
+        Bipartite Networks. Physica A: Statistical Mechanics and its Applications 387.27 (2008): 6869–6875.
+        https://arxiv.org/abs/0710.0117v1
     """
     if nodes is None:
         node_iter = G
@@ -472,7 +488,7 @@ def square_clustering(G, nodes=None):
             degm = squares + 1
             if w in G[u]:
                 degm += 1
-            potential += (len(G[u]) - degm) * (len(G[w]) - degm) + squares
+            potential += (len(G[u]) - degm) + (len(G[w]) - degm) + squares
         if potential > 0:
             clustering[v] /= potential
     if nodes in G:
@@ -483,7 +499,7 @@ def square_clustering(G, nodes=None):
 
 @not_implemented_for("directed")
 def generalized_degree(G, nodes=None):
-    r""" Compute the generalized degree for nodes.
+    r"""Compute the generalized degree for nodes.
 
     For each node, the generalized degree shows how many edges of given
     triangle multiplicity the node is connected to. The triangle multiplicity
