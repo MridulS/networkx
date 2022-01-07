@@ -19,6 +19,33 @@ import uuid
 from itertools import tee, chain
 import networkx as nx
 
+__all__ = [
+    "is_string_like",
+    "iterable",
+    "empty_generator",
+    "flatten",
+    "make_list_of_ints",
+    "is_list_of_ints",
+    "make_str",
+    "generate_unique_node",
+    "default_opener",
+    "dict_to_numpy_array",
+    "dict_to_numpy_array1",
+    "dict_to_numpy_array2",
+    "is_iterator",
+    "arbitrary_element",
+    "consume",
+    "pairwise",
+    "groups",
+    "to_tuple",
+    "create_random_state",
+    "create_py_random_state",
+    "PythonRandomInterface",
+    "nodes_equal",
+    "edges_equal",
+    "graphs_equal",
+]
+
 
 # some cookbook stuff
 # used in deciding whether something is a bunch of nodes, edges, etc.
@@ -26,7 +53,11 @@ import networkx as nx
 
 
 def is_string_like(obj):  # from John Hunter, types-free version
-    """Check if obj is string."""
+    """Check if obj is string.
+
+    .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
+    """
     msg = (
         "is_string_like is deprecated and will be removed in 3.0."
         "Use isinstance(obj, str) instead."
@@ -36,7 +67,11 @@ def is_string_like(obj):  # from John Hunter, types-free version
 
 
 def iterable(obj):
-    """ Return True if obj is iterable with a well-defined len()."""
+    """Return True if obj is iterable with a well-defined len().
+
+    .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
+    """
     msg = (
         "iterable is deprecated and will be removed in 3.0."
         "Use isinstance(obj, (collections.abc.Iterable, collections.abc.Sized)) instead."
@@ -52,12 +87,18 @@ def iterable(obj):
 
 
 def empty_generator():
-    """ Return a generator with no members """
-    yield from ()
+    """Return a generator with no members.
+
+    .. deprecated:: 2.6
+    """
+    warnings.warn(
+        "empty_generator is deprecated and will be removed in v3.0.", DeprecationWarning
+    )
+    return (i for i in ())
 
 
 def flatten(obj, result=None):
-    """ Return flattened version of (possibly nested) iterable object. """
+    """Return flattened version of (possibly nested) iterable object."""
     if not isinstance(obj, (Iterable, Sized)) or isinstance(obj, str):
         return obj
     if result is None:
@@ -107,10 +148,10 @@ def make_list_of_ints(sequence):
 
 
 def is_list_of_ints(intlist):
-    """
-    Return True if list is a list of ints.
+    """Return True if list is a list of ints.
 
     .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
     """
     msg = (
         "is_list_of_ints is deprecated and will be removed in 3.0."
@@ -126,19 +167,36 @@ def is_list_of_ints(intlist):
 
 
 def make_str(x):
-    """Returns the string representation of t."""
+    """Returns the string representation of t.
+
+    .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
+    """
     msg = "make_str is deprecated and will be removed in 3.0. Use str instead."
     warnings.warn(msg, DeprecationWarning)
     return str(x)
 
 
 def generate_unique_node():
-    """ Generate a unique node label."""
-    return str(uuid.uuid1())
+    """Generate a unique node label.
+
+    .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
+    """
+    msg = "generate_unique_node is deprecated and will be removed in 3.0. Use uuid.uuid4 instead."
+    warnings.warn(msg, DeprecationWarning)
+    return str(uuid.uuid4())
 
 
 def default_opener(filename):
     """Opens `filename` using system's default program.
+
+    .. deprecated:: 2.6
+       default_opener is deprecated and will be removed in version 3.0.
+       Consider an image processing library to open images, such as Pillow::
+
+           from PIL import Image
+           Image.open(filename).show()
 
     Parameters
     ----------
@@ -146,6 +204,10 @@ def default_opener(filename):
         The path of the file to be opened.
 
     """
+    warnings.warn(
+        "default_opener is deprecated and will be removed in version 3.0. ",
+        DeprecationWarning,
+    )
     from subprocess import call
 
     cmds = {
@@ -211,13 +273,10 @@ def dict_to_numpy_array1(d, mapping=None):
 
 
 def is_iterator(obj):
-    """Returns True if and only if the given object is an iterator
-    object.
+    """Returns True if and only if the given object is an iterator object.
 
     .. deprecated:: 2.6.0
-
-       Deprecated in favor of ``isinstance(obj, collections.abc.Iterator)``
-
+        Deprecated in favor of ``isinstance(obj, collections.abc.Iterator)``
     """
     msg = (
         "is_iterator is deprecated and will be removed in version 3.0. "
@@ -232,22 +291,63 @@ def arbitrary_element(iterable):
     """Returns an arbitrary element of `iterable` without removing it.
 
     This is most useful for "peeking" at an arbitrary element of a set,
-    but can be used for any list, dictionary, etc., as well::
+    but can be used for any list, dictionary, etc., as well.
 
-        >>> arbitrary_element({3, 2, 1})
+    Parameters
+    ----------
+    iterable : `abc.collections.Iterable` instance
+        Any object that implements ``__iter__``, e.g. set, dict, list, tuple,
+        etc.
+
+    Returns
+    -------
+    The object that results from ``next(iter(iterable))``
+
+    Raises
+    ------
+    ValueError
+        If `iterable` is an iterator (because the current implementation of
+        this function would consume an element from the iterator).
+
+    Examples
+    --------
+    Arbitrary elements from common Iterable objects:
+
+    >>> nx.utils.arbitrary_element([1, 2, 3])  # list
+    1
+    >>> nx.utils.arbitrary_element((1, 2, 3))  # tuple
+    1
+    >>> nx.utils.arbitrary_element({1, 2, 3})  # set
+    1
+    >>> d = {k: v for k, v in zip([1, 2, 3], [3, 2, 1])}
+    >>> nx.utils.arbitrary_element(d)  # dict_keys
+    1
+    >>> nx.utils.arbitrary_element(d.values())   # dict values
+    3
+
+    `str` is also an Iterable:
+
+    >>> nx.utils.arbitrary_element("hello")
+    'h'
+
+    :exc:`ValueError` is raised if `iterable` is an iterator:
+
+    >>> iterator = iter([1, 2, 3])  # Iterator, *not* Iterable
+    >>> nx.utils.arbitrary_element(iterator)
+    Traceback (most recent call last):
+        ...
+    ValueError: cannot return an arbitrary item from an iterator
+
+    Notes
+    -----
+    This function does not return a *random* element. If `iterable` is
+    ordered, sequential calls will return the same value::
+
+        >>> l = [1, 2, 3]
+        >>> nx.utils.arbitrary_element(l)
         1
-        >>> arbitrary_element("hello")
-        'h'
-
-    This function raises a :exc:`ValueError` if `iterable` is an
-    iterator (because the current implementation of this function would
-    consume an element from the iterator)::
-
-        >>> iterator = iter([1, 2, 3])
-        >>> arbitrary_element(iterator)
-        Traceback (most recent call last):
-            ...
-        ValueError: cannot return an arbitrary item from an iterator
+        >>> nx.utils.arbitrary_element(l)
+        1
 
     """
     if isinstance(iterable, Iterator):
@@ -258,7 +358,11 @@ def arbitrary_element(iterable):
 
 # Recipe from the itertools documentation.
 def consume(iterator):
-    "Consume the iterator entirely."
+    """Consume the iterator entirely.
+
+    .. deprecated:: 2.6
+        This is deprecated and will be removed in NetworkX v3.0.
+    """
     # Feed the entire iterator into a zero-length deque.
     msg = (
         "consume is deprecated and will be removed in version 3.0. "
@@ -438,3 +542,107 @@ def create_py_random_state(random_state=None):
         return random.Random(random_state)
     msg = f"{random_state} cannot be used to generate a random.Random instance"
     raise ValueError(msg)
+
+
+def nodes_equal(nodes1, nodes2):
+    """Check if nodes are equal.
+
+    Equality here means equal as Python objects.
+    Node data must match if included.
+    The order of nodes is not relevant.
+
+    Parameters
+    ----------
+    nodes1, nodes2 : iterables of nodes, or (node, datadict) tuples
+
+    Returns
+    -------
+    bool
+        True if nodes are equal, False otherwise.
+    """
+    nlist1 = list(nodes1)
+    nlist2 = list(nodes2)
+    try:
+        d1 = dict(nlist1)
+        d2 = dict(nlist2)
+    except (ValueError, TypeError):
+        d1 = dict.fromkeys(nlist1)
+        d2 = dict.fromkeys(nlist2)
+    return d1 == d2
+
+
+def edges_equal(edges1, edges2):
+    """Check if edges are equal.
+
+    Equality here means equal as Python objects.
+    Edge data must match if included.
+    The order of the edges is not relevant.
+
+    Parameters
+    ----------
+    edges1, edges2 : iterables of with u, v nodes as
+        edge tuples (u, v), or
+        edge tuples with data dicts (u, v, d), or
+        edge tuples with keys and data dicts (u, v, k, d)
+
+    Returns
+    -------
+    bool
+        True if edges are equal, False otherwise.
+    """
+    from collections import defaultdict
+
+    d1 = defaultdict(dict)
+    d2 = defaultdict(dict)
+    c1 = 0
+    for c1, e in enumerate(edges1):
+        u, v = e[0], e[1]
+        data = [e[2:]]
+        if v in d1[u]:
+            data = d1[u][v] + data
+        d1[u][v] = data
+        d1[v][u] = data
+    c2 = 0
+    for c2, e in enumerate(edges2):
+        u, v = e[0], e[1]
+        data = [e[2:]]
+        if v in d2[u]:
+            data = d2[u][v] + data
+        d2[u][v] = data
+        d2[v][u] = data
+    if c1 != c2:
+        return False
+    # can check one direction because lengths are the same.
+    for n, nbrdict in d1.items():
+        for nbr, datalist in nbrdict.items():
+            if n not in d2:
+                return False
+            if nbr not in d2[n]:
+                return False
+            d2datalist = d2[n][nbr]
+            for data in datalist:
+                if datalist.count(data) != d2datalist.count(data):
+                    return False
+    return True
+
+
+def graphs_equal(graph1, graph2):
+    """Check if graphs are equal.
+
+    Equality here means equal as Python objects (not isomorphism).
+    Node, edge and graph data must match.
+
+    Parameters
+    ----------
+    graph1, graph2 : graph
+
+    Returns
+    -------
+    bool
+        True if graphs are equal, False otherwise.
+    """
+    return (
+        graph1.adj == graph2.adj
+        and graph1.nodes == graph2.nodes
+        and graph1.graph == graph2.graph
+    )

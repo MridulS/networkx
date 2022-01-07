@@ -1,5 +1,10 @@
 """Read and write graphs in GEXF format.
 
+.. warning::
+    This parser uses the standard xml library present in Python, which is
+    insecure - see :doc:`library/xml` for additional information.
+    Only parse GEFX files you trust.
+
 GEXF (Graph Exchange XML Format) is a language for describing complex
 network structures, their associated data and dynamics.
 
@@ -50,6 +55,8 @@ def write_gexf(G, path, encoding="utf-8", prettyprint=True, version="1.2draft"):
        Encoding for text data.
     prettyprint : bool (optional, default: True)
        If True use line breaks and indenting in output XML.
+    version: string (optional, default: '1.2draft')
+       The version of GEXF to be used for nodes attributes checking
 
     Examples
     --------
@@ -74,7 +81,7 @@ def write_gexf(G, path, encoding="utf-8", prettyprint=True, version="1.2draft"):
     References
     ----------
     .. [1] GEXF File Format, https://gephi.org/gexf/format/
-    .. [2] GEXF viz schema 1.1, https://gephi.org/gexf/1.1draft/viz
+    .. [2] GEXF schema, https://gephi.org/gexf/format/schema.html
     """
     writer = GEXFWriter(encoding=encoding, prettyprint=prettyprint, version=version)
     writer.add_graph(G)
@@ -958,8 +965,8 @@ class GEXFReader(GEXF):
                 key = a.get("for")  # for is required
                 try:  # should be in our gexf_keys dictionary
                     title = gexf_keys[key]["title"]
-                except KeyError as e:
-                    raise nx.NetworkXError(f"No attribute defined for={key}.") from e
+                except KeyError as err:
+                    raise nx.NetworkXError(f"No attribute defined for={key}.") from err
                 atype = gexf_keys[key]["type"]
                 value = a.get("value")
                 if atype == "boolean":
@@ -1029,10 +1036,10 @@ def relabel_gexf_graph(G):
     # build mapping of node labels, do some error checking
     try:
         mapping = [(u, G.nodes[u]["label"]) for u in G]
-    except KeyError as e:
+    except KeyError as err:
         raise nx.NetworkXError(
             "Failed to relabel nodes: missing node labels found. Use relabel=False."
-        ) from e
+        ) from err
     x, y = zip(*mapping)
     if len(set(y)) != len(G):
         raise nx.NetworkXError(

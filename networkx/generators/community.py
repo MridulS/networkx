@@ -859,7 +859,7 @@ def LFR_benchmark_graph(
         created graph. This value must be strictly greater than one.
 
     mu : float
-        Fraction of intra-community edges incident to each node. This
+        Fraction of inter-community edges incident to each node. This
         value must be in the interval [0, 1].
 
     average_degree : float
@@ -978,7 +978,7 @@ def LFR_benchmark_graph(
     .. [1] "Benchmark graphs for testing community detection algorithms",
            Andrea Lancichinetti, Santo Fortunato, and Filippo Radicchi,
            Phys. Rev. E 78, 046110 2008
-    .. [2] http://santo.fortunato.googlepages.com/inthepress2
+    .. [2] https://www.santofortunato.net/resources
 
     """
     # Perform some basic parameter validation.

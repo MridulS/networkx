@@ -13,7 +13,9 @@ Examples
 
 See Also
 --------
-Pygraphviz: http://pygraphviz.github.io/
+ - Pygraphviz: http://pygraphviz.github.io/
+ - Graphviz:      https://www.graphviz.org
+ - DOT Language:  http://www.graphviz.org/doc/info/lang.html
 """
 import os
 import tempfile
@@ -128,8 +130,10 @@ def to_agraph(N):
     """
     try:
         import pygraphviz
-    except ImportError as e:
-        raise ImportError("requires pygraphviz " "http://pygraphviz.github.io/") from e
+    except ImportError as err:
+        raise ImportError(
+            "requires pygraphviz " "http://pygraphviz.github.io/"
+        ) from err
     directed = N.is_directed()
     strict = nx.number_of_selfloops(N) == 0 and not N.is_multigraph()
     A = pygraphviz.AGraph(name=N.name, strict=strict, directed=directed)
@@ -196,10 +200,10 @@ def read_dot(path):
     """
     try:
         import pygraphviz
-    except ImportError as e:
+    except ImportError as err:
         raise ImportError(
             "read_dot() requires pygraphviz " "http://pygraphviz.github.io/"
-        ) from e
+        ) from err
     A = pygraphviz.AGraph(file=path)
     gr = from_agraph(A)
     A.clear()
@@ -277,8 +281,10 @@ def pygraphviz_layout(G, prog="neato", root=None, args=""):
     """
     try:
         import pygraphviz
-    except ImportError as e:
-        raise ImportError("requires pygraphviz " "http://pygraphviz.github.io/") from e
+    except ImportError as err:
+        raise ImportError(
+            "requires pygraphviz " "http://pygraphviz.github.io/"
+        ) from err
     if root is not None:
         args += f"-Groot={root}"
     A = to_agraph(G)
@@ -322,7 +328,7 @@ def view_pygraphviz(
         The filename used to save the image.  If None, save to a temporary
         file.  File formats are the same as those from pygraphviz.agraph.draw.
     show : bool, default = True
-        Whether to display the graph with `networkx.utils.default_opener`,
+        Whether to display the graph with :mod:`PIL.Image.show`,
         default is `True`. If `False`, the rendered graph is still available
         at `path`.
 
@@ -396,7 +402,7 @@ def view_pygraphviz(
 
     # If the user passed in an edgelabel, we update the labels for all edges.
     if edgelabel is not None:
-        if not hasattr(edgelabel, "__call__"):
+        if not callable(edgelabel):
 
             def func(data):
                 return "".join(["  ", str(data[edgelabel]), "  "])
@@ -432,7 +438,9 @@ def view_pygraphviz(
 
     # Show graph in a new window (depends on platform configuration)
     if show:
-        nx.utils.default_opener(path.name)
+        from PIL import Image
+
+        Image.open(path.name).show()
 
     return path.name, A
 
@@ -461,12 +469,14 @@ def display_pygraphviz(graph, path, format=None, prog=None, args=""):
     calls if you experience problems.
 
     """
+    from PIL import Image
     import warnings
 
     warnings.warn(
         "display_pygraphviz is deprecated and will be removed in NetworkX 3.0. "
         "To view a graph G using pygraphviz, use nx.nx_agraph.view_pygraphviz(G). "
-        "To view a graph from file, consider nx.utils.default_opener(filename).",
+        "To view a graph from file, consider an image processing libary like "
+        "`Pillow`, e.g. ``PIL.Image.open(path.name).show()``",
         DeprecationWarning,
     )
     if format is None:
@@ -480,4 +490,4 @@ def display_pygraphviz(graph, path, format=None, prog=None, args=""):
     # We must close the file before viewing it.
     graph.draw(path, format, prog, args)
     path.close()
-    nx.utils.default_opener(filename)
+    Image.open(filename).show()

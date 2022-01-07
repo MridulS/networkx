@@ -5,7 +5,7 @@ sp = pytest.importorskip("scipy")
 import scipy.sparse  # call as sp.sparse
 
 import networkx as nx
-from networkx.testing import assert_graphs_equal
+from networkx.utils import graphs_equal
 from networkx.generators.classic import barbell_graph, cycle_graph, path_graph
 
 
@@ -33,38 +33,35 @@ class TestConvertScipy:
         G.add_weighted_edges_from(ex)
         return G
 
-    def assert_isomorphic(self, G1, G2):
-        assert nx.is_isomorphic(G1, G2)
-
     def identity_conversion(self, G, A, create_using):
         GG = nx.from_scipy_sparse_matrix(A, create_using=create_using)
-        self.assert_isomorphic(G, GG)
+        assert nx.is_isomorphic(G, GG)
 
         GW = nx.to_networkx_graph(A, create_using=create_using)
-        self.assert_isomorphic(G, GW)
+        assert nx.is_isomorphic(G, GW)
 
         GI = nx.empty_graph(0, create_using).__class__(A)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
         ACSR = A.tocsr()
         GI = nx.empty_graph(0, create_using).__class__(ACSR)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
         ACOO = A.tocoo()
         GI = nx.empty_graph(0, create_using).__class__(ACOO)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
         ACSC = A.tocsc()
         GI = nx.empty_graph(0, create_using).__class__(ACSC)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
         AD = A.todense()
         GI = nx.empty_graph(0, create_using).__class__(AD)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
         AA = A.toarray()
         GI = nx.empty_graph(0, create_using).__class__(AA)
-        self.assert_isomorphic(G, GI)
+        assert nx.is_isomorphic(G, GI)
 
     def test_shape(self):
         "Conversion from non-square sparse array."
@@ -98,7 +95,7 @@ class TestConvertScipy:
         nodelist = list(P3.nodes())
         A = nx.to_scipy_sparse_matrix(P4, nodelist=nodelist)
         GA = nx.Graph(A)
-        self.assert_isomorphic(GA, P3)
+        assert nx.is_isomorphic(GA, P3)
 
         pytest.raises(nx.NetworkXError, nx.to_scipy_sparse_matrix, P3, nodelist=[])
         # Test nodelist duplicates.
@@ -180,7 +177,7 @@ class TestConvertScipy:
         G = nx.Graph()
         G.add_node(1)
         M = nx.to_scipy_sparse_matrix(G)
-        np.testing.assert_equal(M.todense(), np.matrix([[0]]))
+        np.testing.assert_equal(M.toarray(), np.array([[0]]))
 
     def test_ordering(self):
         G = nx.DiGraph()
@@ -189,29 +186,29 @@ class TestConvertScipy:
         G.add_edge(3, 1)
         M = nx.to_scipy_sparse_matrix(G, nodelist=[3, 2, 1])
         np.testing.assert_equal(
-            M.todense(), np.matrix([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+            M.toarray(), np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
         )
 
     def test_selfloop_graph(self):
         G = nx.Graph([(1, 1)])
         M = nx.to_scipy_sparse_matrix(G)
-        np.testing.assert_equal(M.todense(), np.matrix([[1]]))
+        np.testing.assert_equal(M.toarray(), np.array([[1]]))
 
         G.add_edges_from([(2, 3), (3, 4)])
         M = nx.to_scipy_sparse_matrix(G, nodelist=[2, 3, 4])
         np.testing.assert_equal(
-            M.todense(), np.matrix([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
+            M.toarray(), np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
         )
 
     def test_selfloop_digraph(self):
         G = nx.DiGraph([(1, 1)])
         M = nx.to_scipy_sparse_matrix(G)
-        np.testing.assert_equal(M.todense(), np.matrix([[1]]))
+        np.testing.assert_equal(M.toarray(), np.array([[1]]))
 
         G.add_edges_from([(2, 3), (3, 4)])
         M = nx.to_scipy_sparse_matrix(G, nodelist=[2, 3, 4])
         np.testing.assert_equal(
-            M.todense(), np.matrix([[0, 1, 0], [0, 0, 1], [0, 0, 0]])
+            M.toarray(), np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]])
         )
 
     def test_from_scipy_sparse_matrix_parallel_edges(self):
@@ -230,11 +227,11 @@ class TestConvertScipy:
         actual = nx.from_scipy_sparse_matrix(
             A, parallel_edges=True, create_using=nx.DiGraph
         )
-        assert_graphs_equal(actual, expected)
+        assert graphs_equal(actual, expected)
         actual = nx.from_scipy_sparse_matrix(
             A, parallel_edges=False, create_using=nx.DiGraph
         )
-        assert_graphs_equal(actual, expected)
+        assert graphs_equal(actual, expected)
         # Now each integer entry in the adjacency matrix is interpreted as the
         # number of parallel edges in the graph if the appropriate keyword
         # argument is specified.
@@ -244,7 +241,7 @@ class TestConvertScipy:
         actual = nx.from_scipy_sparse_matrix(
             A, parallel_edges=True, create_using=nx.MultiDiGraph
         )
-        assert_graphs_equal(actual, expected)
+        assert graphs_equal(actual, expected)
         expected = nx.MultiDiGraph()
         expected.add_edges_from(set(edges), weight=1)
         # The sole self-loop (edge 0) on vertex 1 should have weight 2.
@@ -252,7 +249,7 @@ class TestConvertScipy:
         actual = nx.from_scipy_sparse_matrix(
             A, parallel_edges=False, create_using=nx.MultiDiGraph
         )
-        assert_graphs_equal(actual, expected)
+        assert graphs_equal(actual, expected)
 
     def test_symmetric(self):
         """Tests that a symmetric matrix has edges added only once to an
@@ -264,7 +261,7 @@ class TestConvertScipy:
         G = nx.from_scipy_sparse_matrix(A, create_using=nx.MultiGraph)
         expected = nx.MultiGraph()
         expected.add_edge(0, 1, weight=1)
-        assert_graphs_equal(G, expected)
+        assert graphs_equal(G, expected)
 
 
 @pytest.mark.parametrize("sparse_format", ("csr", "csc", "dok"))
@@ -283,4 +280,4 @@ def test_from_scipy_sparse_matrix_formats(sparse_format):
         ]
     )
     A = sp.sparse.coo_matrix([[0, 3, 2], [3, 0, 1], [2, 1, 0]]).asformat(sparse_format)
-    assert_graphs_equal(expected, nx.from_scipy_sparse_matrix(A))
+    assert graphs_equal(expected, nx.from_scipy_sparse_matrix(A))

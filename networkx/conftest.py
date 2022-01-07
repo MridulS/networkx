@@ -1,3 +1,16 @@
+"""
+Testing
+=======
+
+General guidelines for writing good tests:
+
+- doctests always assume ``import networkx as nx`` so don't add that
+- prefer pytest fixtures over classes with setup methods.
+- use the ``@pytest.mark.parametrize``  decorator
+- use ``pytest.importorskip`` for numpy, scipy, pandas, and matplotlib b/c of PyPy.
+  and add the module to the relevant entries below.
+
+"""
 import pytest
 import networkx
 import sys
@@ -28,6 +41,15 @@ def pytest_collection_modifyitems(config, items):
 @pytest.fixture(autouse=True)
 def set_warnings():
     warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="k_nearest_neighbors"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="numeric_mixing_matrix"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message=r"Ordered.* is deprecated"
+    )
+    warnings.filterwarnings(
         "ignore",
         category=DeprecationWarning,
         message="literal_stringizer is deprecated",
@@ -41,7 +63,24 @@ def set_warnings():
         "ignore", category=DeprecationWarning, message="is_string_like is deprecated"
     )
     warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="\nauthority_matrix"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="\nhub_matrix"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="default_opener is deprecated"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="empty_generator is deprecated"
+    )
+    warnings.filterwarnings(
         "ignore", category=DeprecationWarning, message="make_str is deprecated"
+    )
+    warnings.filterwarnings(
+        "ignore",
+        category=DeprecationWarning,
+        message="generate_unique_node is deprecated",
     )
     warnings.filterwarnings(
         "ignore",
@@ -104,6 +143,43 @@ def set_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning, message="consume")
     warnings.filterwarnings(
         "ignore", category=DeprecationWarning, message="iterable is deprecated"
+    )
+    warnings.filterwarnings(
+        "ignore",
+        category=FutureWarning,
+        message="\nThe function signature for cytoscape",
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="\nThe `attrs` keyword"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="preserve_random_state"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="`almost_equal`"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="`assert_nodes_equal`"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="`assert_edges_equal`"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="`assert_graphs_equal`"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="networkx.hits_scipy"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="networkx.hits_numpy"
+    )
+    warnings.filterwarnings(
+        "ignore", category=DeprecationWarning, message="preserve_random_state"
+    )
+    warnings.filterwarnings(
+        "ignore",
+        category=FutureWarning,
+        message="google_matrix will return an np.ndarray instead of a np.matrix",
     )
 
 
@@ -176,6 +252,7 @@ except ImportError:
 collect_ignore = []
 
 needs_numpy = [
+    "algorithms/approximation/traveling_salesman.py",
     "algorithms/centrality/current_flow_closeness.py",
     "algorithms/node_classification/__init__.py",
     "algorithms/non_randomness.py",
@@ -185,6 +262,7 @@ needs_numpy = [
     "utils/misc.py",
 ]
 needs_scipy = [
+    "algorithms/approximation/traveling_salesman.py",
     "algorithms/assortativity/correlation.py",
     "algorithms/assortativity/mixing.py",
     "algorithms/assortativity/pairs.py",
@@ -199,6 +277,7 @@ needs_scipy = [
     "algorithms/communicability_alg.py",
     "algorithms/link_analysis/hits_alg.py",
     "algorithms/link_analysis/pagerank_alg.py",
+    "algorithms/node_classification/__init__.py",
     "algorithms/node_classification/hmn.py",
     "algorithms/node_classification/lgc.py",
     "algorithms/similarity.py",
@@ -207,6 +286,7 @@ needs_scipy = [
     "generators/spectral_graph_forge.py",
     "linalg/algebraicconnectivity.py",
     "linalg/attrmatrix.py",
+    "linalg/bethehessianmatrix.py",
     "linalg/graphmatrix.py",
     "linalg/modularitymatrix.py",
     "linalg/spectrum.py",

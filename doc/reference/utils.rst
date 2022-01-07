@@ -11,6 +11,7 @@ Helper Functions
 .. autosummary::
    :toctree: generated/
 
+   arbitrary_element
    is_string_like
    flatten
    iterable
@@ -21,7 +22,9 @@ Helper Functions
    pairwise
    groups
    create_random_state
-
+   nodes_equal
+   edges_equal
+   graphs_equal
 
 Data Structures and Algorithms
 ------------------------------
@@ -53,8 +56,9 @@ Decorators
    open_file
    not_implemented_for
    nodes_or_number
-   preserve_random_state
-   random_state
+   np_random_state
+   py_random_state
+   argmap
 
 Cuthill-Mckee Ordering
 ----------------------
