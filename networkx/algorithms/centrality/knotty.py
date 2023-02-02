@@ -1,14 +1,12 @@
 import numpy as np
 
 import networkx as nx
-
-__author__ = """\n""".join(
-    ["Murray Shanahan", "Mark Wildie", "Erik Ziegler <erik.ziegler@ulg.ac.be>"]
-)
+from networkx.utils import not_implemented_for
 
 __all__ = ["knotty_centrality"]
 
 
+@not_implemented_for("directed", "multigraph")
 def knotty_centrality(G, compact=True):
     """Return the sub-graph with the highest value of knotty centrality
 
@@ -50,10 +48,6 @@ def knotty_centrality(G, compact=True):
     PLoS ONE 7(5): e36579. doi:10.1371/journal.pone.0036579
 
     """
-    if G.is_multigraph() or G.is_directed():
-        raise Exception(
-            "knotty centrality is not implemented for ", "directed or multiedge graphs."
-        )
     return _find_knotty_centre(G, compact)
 
 
@@ -64,16 +58,12 @@ def _find_knotty_centre(G, compact):
     N = G.number_of_nodes()
 
     # binarise matrix - all non-zero weights become 1s
-    edge_matrix = np.array(nx.to_numpy_matrix(G))
-    CIJ = edge_matrix != 0
-    CIJ = CIJ.astype(int)
+    CIJ = nx.to_numpy_array(G, weight=None)
 
     # Exhastive search phase
-    Exh = 5  # number of nodes for exhaustive search (2^Exh combinations)
-    Exh = min([Exh, N])
+    Exh = min(5, N)  # number of nodes for exhaustive search (2^Exh combinations)
 
-    BC_dict = nx.betweenness_centrality(G)
-    BC_list = list(BC_dict.values())
+    BC_list = list(nx.betweenness_centrality(G).values())
 
     BC = np.array(BC_list) / sum(BC_list)  # normalise wrt total betweenness centrality
 
@@ -81,26 +71,23 @@ def _find_knotty_centre(G, compact):
     BC2 = BC + np.sum(CIJ * BC, axis=0) + np.sum(CIJ, axis=1).T * BC
 
     # Ranking the nodes in descending order
-    array_asc = BC2.ravel().argsort()
-    list_asc = array_asc.tolist()
-    list_asc.reverse()  # list_asc is not descending
-    IxBC = list_asc
+    IxBC = np.argsort(BC2)[::-1].tolist()
 
     nodes = []
-    improving = 1
+    improving = True
 
     while improving:
         L = len(nodes)
-        nodes_left = IxBC
-        nodes_left = [x for x in nodes_left if x not in set(nodes)]
-        choices = [nodes_left[i] for i in range(0, min([Exh, len(nodes_left)]))]
+        # nodes_left = IxBC
+        nodes_left = [x for x in IxBC if x not in set(nodes)]
+        # choices = [nodes_left[i] for i in range(0, min([Exh, len(nodes_left)]))]
+        choices = nodes_left[: min(Exh, len(nodes_left))]
         nodes, kc = _best_perm(nodes, choices, G, CIJ, compact, BC)
         improving = len(nodes) > L
 
     # Hill climbing phase
-    nodes_left = range(0, N)
-    nodes_left = [x for x in nodes_left if x not in set(nodes)]
-    improving = 1
+    nodes_left = [x for x in range(N) if x not in set(nodes)]
+    improving = True
 
     while improving and nodes_left:
         best_kc = 0
