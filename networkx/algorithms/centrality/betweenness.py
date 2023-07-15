@@ -247,6 +247,7 @@ def edge_betweenness_centrality(G, k=None, normalized=True, weight=None, seed=No
 # helpers for betweenness centrality
 
 
+@nx._dispatch
 def _single_source_shortest_path_basic(G, s):
     S = []
     P = {}
@@ -272,6 +273,7 @@ def _single_source_shortest_path_basic(G, s):
     return S, P, sigma, D
 
 
+@nx._dispatch
 def _single_source_dijkstra_path_basic(G, s, weight):
     weight = _weight_function(G, weight)
     # modified from Eppstein
