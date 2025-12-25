@@ -59,6 +59,7 @@ nx_loopback = 'networkx.classes.tests.dispatch_interface:backend_interface'
 benchmarking = [
     'asv',
     'virtualenv',
+    'pytest-codspeed==4.2.0',
 ]
 default = [
     'numpy>=1.25',

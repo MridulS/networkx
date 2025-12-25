@@ -26,6 +26,11 @@ NetworkX
     https://insights.linuxfoundation.org/api/badge/health-score?project=networkx
     :target: https://insights.linuxfoundation.org/project/networkx
 
+.. image::
+    https://img.shields.io/badge/CodSpeed-performance%20tracking-blue
+    :alt: CodSpeed
+    :target: https://codspeed.io/MridulS/networkx?utm_source=badge
+
 
 NetworkX is a Python package for the creation, manipulation,
 and study of the structure, dynamics, and functions
